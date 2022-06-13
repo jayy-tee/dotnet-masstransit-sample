@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-JayyTee.MassTransitSample.Worker-72BA15B6-4C7B-43F3-B3B3-B9097AA9C01E</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\JayyTee.MassTransitSample.Application\JayyTee.MassTransitSample.Application.csproj" />
+      <ProjectReference Include="..\JayyTee.MassTransitSample.Shared\JayyTee.MassTransitSample.Shared.csproj" />
+    </ItemGroup>
+</Project>

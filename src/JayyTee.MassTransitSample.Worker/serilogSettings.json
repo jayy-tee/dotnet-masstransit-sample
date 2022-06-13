@@ -1,0 +1,49 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+        }
+    },
+    "Serilog": {
+        "Using": [
+            "Serilog.Sinks.Console"
+        ],
+        "MinimumLevel": {
+            "Default": "Information",
+            "Override": {
+                "Microsoft": "Warning",
+                "Microsoft.AspNetCore": "Warning",
+                "Microsoft.Hosting.Lifetime": "Information",
+                "Microsoft.EntityFrameworkCore": "Warning"
+            }
+        },
+        "Enrich": [
+            "FromLogContext",
+            "WithMachineName",
+            "WithThreadId",
+            {
+                "Name": "AtLevel",
+                "Args": {
+                    "enrichFromLevel": "Error",
+                    "configureEnricher": [
+                        "WithThreadName"
+                    ]
+                }
+            }
+        ],
+        "Properties": {
+            "Application": "JayyTee.MassTransitSample.Worker",
+            "Environment": "___loggingEnvironment___"
+        },
+        "WriteTo": [
+            {
+                "Name": "Console",
+                "Args": {
+                    "restrictedToMinimumLevel": "Error",
+                    "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                }
+            }
+        ]
+    }
+}

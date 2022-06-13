@@ -9,12 +9,11 @@ namespace JayyTee.MassTransitSample;
 
 public static class MessagingRegistrationExtensions
 {
-    public static IServiceCollection AddSendOnlyMessaging(this IServiceCollection services, IConfiguration configuration, Action<IBusRegistrationConfigurator> busConfig)
+    public static IServiceCollection AddSendOnlyMessaging(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<RabbitMqSettings>(configuration.GetSection(RabbitMqSettings.SectionName));
         services.AddMassTransit(config =>
         {
-            busConfig.Invoke(config);
             config.UsingRabbitMq((context, configurator) => ConfigureRabbitMqFromOptions(context, configurator));
         });
 

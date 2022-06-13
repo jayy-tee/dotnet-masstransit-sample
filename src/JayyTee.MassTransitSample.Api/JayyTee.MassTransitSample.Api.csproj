@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\JayyTee.MassTransitSample.Application\JayyTee.MassTransitSample.Application.csproj" />
+      <ProjectReference Include="..\JayyTee.MassTransitSample.Shared\JayyTee.MassTransitSample.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.3.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.3.1" />
+      <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.3.1" />
+    </ItemGroup>
+
+</Project>

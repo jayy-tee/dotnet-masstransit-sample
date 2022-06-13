@@ -44,10 +44,6 @@ public partial class Program
     {
         services.AddApplicationServices();
         services.AddMessagingEndpoints(hostContext.Configuration,
-            consumerAnchorTypesForRegistration: new[]
-            {
-                typeof(ConsumerAnchor),
-                typeof(JayyTee.MassTransitSample.Application.ConsumerAnchor)
-            });
+            consumerAnchorTypesForRegistration: new[] { typeof(ConsumerAnchor), typeof(JayyTee.MassTransitSample.Application.ConsumerAnchor) });
     }
 }

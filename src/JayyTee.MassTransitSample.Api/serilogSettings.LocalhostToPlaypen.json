@@ -1,0 +1,22 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Information"
+        }
+    },
+    "Serilog": {
+        "Properties": {
+            "Environment": "Local"
+        },
+        "WriteTo": [
+            {
+                "Name": "Console",
+                "Args": {
+                    "restrictedToMinimumLevel": "Debug",
+                    "outputTemplate": "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                }
+            }
+        ]
+    }
+}

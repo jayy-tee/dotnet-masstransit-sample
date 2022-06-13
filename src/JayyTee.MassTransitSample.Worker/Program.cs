@@ -41,6 +41,7 @@ public partial class Program
     */
     public static void AddServices(HostBuilderContext hostContext, IServiceCollection services)
     {
+        services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(15));
         services.AddApplicationServices();
         services.AddMessagingEndpoints(hostContext.Configuration,
             consumerAnchorTypesForRegistration: new[] { typeof(ConsumerAnchor), typeof(JayyTee.MassTransitSample.Application.ConsumerAnchor) });

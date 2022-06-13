@@ -13,7 +13,6 @@ try
 
     var host = Host.CreateDefaultBuilder(args)
         .ConfigureHostConfiguration(c => c.AddConfiguration(configuration))
-        .ConfigureAppConfiguration(c => c.AddConfiguration(configuration))
         .UseCustomSerilog()
         .ConfigureServices(AddServices)
         .Build();

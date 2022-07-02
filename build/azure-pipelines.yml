@@ -1,0 +1,62 @@
+name: $(Year:yyyy).$(Date:MMdd).$(rev:rr)-$(Build.SourceBranchName)
+
+trigger:
+  - none
+
+variables:
+  buildTarget: "**/*.sln"
+  failingTestsShouldFailTheBuild: ${{ or( eq(variables['Build.SourceBranchName'], 'master'), eq(variables['Build.Reason'], 'PullRequest') ) }}
+
+stages:
+  - stage: build
+    displayName: Build & Test Solution
+    jobs:
+      - job: build
+        displayName: Build & Run In-Process Tests
+        pool:
+          vmImage: "ubuntu-latest"
+        steps:
+          - bash: |
+              docker-compose -p masstransit-sample -f deploy/local/docker-compose.yml up --build -d
+            displayName: Start Docker Dependencies
+
+          - task: UseDotNet@2
+            displayName: "Use .NET Core sdk"
+            inputs:
+              packageType: sdk
+              version: 6.x
+              installationPath: $(Agent.ToolsDirectory)/dotnet
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet restore"
+            inputs:
+              command: restore
+              projects: $(buildTarget)
+
+          - task: DotNetCoreCLI@2
+            displayName: "dotnet publish"
+            inputs:
+              command: publish
+              projects: $(buildTarget)
+              arguments: "--no-restore -c Release -p:Version=$(Build.BuildNumber)"
+              publishWebProjects: false
+              zipAfterPublish: false
+
+          - task: DotNetCoreCLI@2
+            displayName: Run In-Process Tests
+            inputs:
+              command: test
+              projects: "test/JayyTee.MassTransitSample.Worker.Tests/JayyTee.MassTransitSample.Worker.Tests.csproj"
+              arguments: "-c Release -s test/JayyTee.MassTransitSample.Worker.Tests/TestExecutionContext/Test.Local-InProcess.runsettings --logger trx"
+              publishTestResults: false
+              nobuild: true
+              testRunTitle: "Acceptance-Tests"
+
+          - task: PublishTestResults@2
+            displayName: Publish Test Results
+            condition: succeededOrFailed()
+            inputs:
+              testRunner: VSTest
+              testResultsFiles: "**/*.trx"
+              failTaskOnFailedTests: $(failingTestsShouldFailTheBuild)
+              publishRunAttachments: true

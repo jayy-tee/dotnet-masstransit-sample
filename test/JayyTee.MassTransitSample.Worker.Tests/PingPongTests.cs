@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using FluentAssertions;
 using JayyTee.MassTransitSample.Application.Features.PingPong;
+using JayyTee.MassTransitSample.Worker.Tests.Infrastructure;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,7 @@ public class PingPongTests : MassTransitTestBase
 
         var pongReceiver = Resolve<MessageList<Pong>>();
 
-        await EventuallyAsync(async () =>
+        RetryHelper.Eventually(() =>
         {
             pongReceiver.Received.Count.Should().BeGreaterThan(0);
             pongReceiver.Received.Select(p => p.CorrelationId).Should().Contain(correlationId);

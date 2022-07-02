@@ -4,20 +4,18 @@ namespace JayyTee.MassTransitSample.Shared.Configuration;
 
 public static class ConfigurationSingleton
 {
-    private const string EnvironmentPrefixDefault = "JAYYTEE";
-    private static string _environmentVariablePrefix = null;
+    private const string EnvironmentPrefixDefault = "MT_SAMPLE_";
     private static IConfiguration? _instance;
     private static readonly object _padlock = new object();
 
-    public static IConfiguration Instance => _instance ?? throw new InvalidOperationException($"Configuration has not been initialised. Did you forget to call {nameof(Initialise)}");
+    public static IConfiguration Instance => _instance ?? Initialise();
 
-    public static IConfiguration Initialise(string? environmentVariablePrefix)
+    private static IConfiguration Initialise()
     {
         if (_instance is not null) return _instance;
 
         lock (_padlock)
         {
-            _environmentVariablePrefix = environmentVariablePrefix ?? _environmentVariablePrefix;
             _instance ??= BuildConfiguration();
         }
 
@@ -36,7 +34,7 @@ public static class ConfigurationSingleton
             .AddJsonFile("serilogSettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile($"appsettings.{configurationName}.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"serilogSettings.{configurationName}.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables(_environmentVariablePrefix);
+            .AddEnvironmentVariables(EnvironmentPrefixDefault);
 
         return builder.Build();
     }

@@ -83,7 +83,7 @@ public abstract class AcceptanceTestBase
 
     private void InitialiseInProcessHost()
     {
-        var hostConfiguration = ConfigurationSingleton.Initialise(EnvironmentVariablePrefix);
+        var hostConfiguration = ConfigurationSingleton.Instance;
 
         var workerAssembly = typeof(Program).Assembly;
         var workerAssemblyPath = Path.GetDirectoryName(workerAssembly.Location);

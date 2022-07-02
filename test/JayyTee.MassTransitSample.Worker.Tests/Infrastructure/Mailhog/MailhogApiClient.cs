@@ -5,7 +5,7 @@ namespace JayyTee.MassTransitSample.Worker.Tests.Infrastructure.Mailhog;
 
 public record MailhogMessage
 {
-    public ICollection<string> Recipients { get; set; }
+    public ICollection<string>? Recipients { get; set; } = null!;
     public string FromAddress { get; set; } = null!;
     public string Subject { get; set; } = null!;
     public string Body { get; set; } = null!;
@@ -48,6 +48,6 @@ public class MailhogApiClient
                 .ToArray(),
             FromAddress = $"{item.From.Mailbox}@{item.From.Domain}",
             Subject = item.Content.Headers.Subject?.FirstOrDefault() ?? string.Empty,
-            Body = item.Content.Body
+            Body = item.Content.Body ?? string.Empty
         };
 }

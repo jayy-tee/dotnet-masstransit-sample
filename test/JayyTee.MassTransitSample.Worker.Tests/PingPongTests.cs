@@ -41,7 +41,7 @@ public class PingPongTests : MassTransitTestBase
 
 public class ReceivedMessage<TMessage> where TMessage : class
 {
-    public TMessage Message { get; set; }
+    public TMessage Message { get; set; } = null!;
     public Guid CorrelationId { get; set; }
 }
 

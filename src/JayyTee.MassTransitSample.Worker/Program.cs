@@ -2,9 +2,7 @@ using JayyTee.MassTransitSample.Shared.Configuration;
 using JayyTee.MassTransitSample.Shared.Logging;
 using Serilog;
 
-const string ServiceEnvironmentVariablePrefix = "JAYYTEE_WORKER";
-
-var configuration = ConfigurationSingleton.Initialise(ServiceEnvironmentVariablePrefix);
+var configuration = ConfigurationSingleton.Instance;
 Log.Logger = LoggingExtensions.BuildLogger(configuration);
 
 try

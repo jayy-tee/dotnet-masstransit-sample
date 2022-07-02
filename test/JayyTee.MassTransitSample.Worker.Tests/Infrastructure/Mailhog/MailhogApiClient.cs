@@ -1,6 +1,5 @@
 using System.Text.Json;
 using JayyTee.MassTransitSample.Worker.Tests.Infrastructure.Mailhog.Responses;
-using MassTransit.Futures.Contracts;
 
 namespace JayyTee.MassTransitSample.Worker.Tests.Infrastructure.Mailhog;
 
@@ -10,9 +9,7 @@ public record MailhogMessage
     public string FromAddress { get; set; } = null!;
     public string Subject { get; set; } = null!;
     public string Body { get; set; } = null!;
-
 }
-
 
 public class MailhogApiClient : IDisposable
 {
@@ -31,7 +28,7 @@ public class MailhogApiClient : IDisposable
         await _httpClient.DeleteAsync("/api/v1/messages");
     }
 
-    public async Task<IEnumerable<MailhogMessage>> FindMessagesByRecipient(string recipientAddress)
+    public async Task<IReadOnlyCollection<MailhogMessage>> FindMessagesByRecipient(string recipientAddress)
     {
         using var httpResponse = await _httpClient.GetAsync($"/api/v2/search?kind=to&query={recipientAddress}");
 
@@ -42,23 +39,20 @@ public class MailhogApiClient : IDisposable
 
         if (response is null) return results;
 
-        foreach (var item in response.Items)
-        {
-            results.Add(new MailhogMessage
-            {
-                Recipients = item.To
-                    .Select(to => $"{to.Mailbox}@{to.Domain}")
-                    .ToArray()
-                ,
-                FromAddress = $"{item.From.Mailbox}@{item.From.Domain}",
-                Subject = item.Content.Headers.Subject?.FirstOrDefault() ?? string.Empty,
-                Body = item.Content.Body
-            });
-        }
-
+        results.AddRange(response.Items.Select(MapToMailhogMessage));
 
         return results;
     }
+
+    private static MailhogMessage MapToMailhogMessage(Message item) =>
+        new MailhogMessage
+        {
+            Recipients = item.To.Select(to => $"{to.Mailbox}@{to.Domain}")
+                .ToArray(),
+            FromAddress = $"{item.From.Mailbox}@{item.From.Domain}",
+            Subject = item.Content.Headers.Subject?.FirstOrDefault() ?? string.Empty,
+            Body = item.Content.Body
+        };
 
     public void Dispose() => _httpClient.Dispose();
 }

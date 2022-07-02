@@ -38,11 +38,19 @@ public class PasswordResetTests : MassTransitTestBase
 
         await publisher.Publish<ResetPassword>(new { EmailAddress = recipient });
 
-        await EventuallyAsync(callback: async () =>
+        var result = await EventuallyReturnAsync(AMessageFromMailhog(recipient, expectedEmail), timeoutInSeconds: 10, waitBetweenRetriesInMillis: 100);
+
+        result.Should().NotBeNull();
+        result!.Body.Should().ContainAll("password", "account");
+    }
+
+    private Func<Task<MailhogMessage?>> AMessageFromMailhog(string recipient, MailhogMessage expectedEmail) =>
+        async () =>
         {
             var emails = await _client.FindMessagesByRecipient(recipient);
             emails.Should().HaveCountGreaterThan(0);
             emails.Should().ContainEquivalentOf(expectedEmail, options => options.Excluding(m => m.Body));
-        }, timeoutInSeconds: 10, waitBetweenRetriesInMillis: 100);
-    }
+
+            return emails.FirstOrDefault();
+        };
 }

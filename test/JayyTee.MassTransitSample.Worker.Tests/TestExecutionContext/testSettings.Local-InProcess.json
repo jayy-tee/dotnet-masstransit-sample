@@ -1,0 +1,7 @@
+{
+    "TestSettings": {
+        "RunInProcess": true,
+        "EnvironmentVariables": {
+        }
+    }
+}

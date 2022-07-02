@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework.Internal;
+using Serilog;
 
 namespace JayyTee.MassTransitSample.Worker.Tests;
 
@@ -17,6 +18,8 @@ public abstract class AcceptanceTestBase
     private IHost? _host;
     private TestSettings _testSettings = null!;
     private string[] _testCategoriesToBeIgnored = null!;
+
+    private List<string> _logsFilesToAttach = new();
 
     protected T Resolve<T>() where T : notnull => _testScope.ServiceProvider.GetRequiredService<T>();
 
@@ -84,7 +87,9 @@ public abstract class AcceptanceTestBase
         var workerAssembly = typeof(Program).Assembly;
         var workerAssemblyPath = Path.GetDirectoryName(workerAssembly.Location);
 
-        //TODO: Add logging to file for host.
+        var logPath = Path.Combine("TestLogs", $"AcceptanceTest_Host_{Guid.NewGuid():N}.log.txt");
+        _logsFilesToAttach.Add(logPath);
+
         _host = new HostBuilder()
             .UseContentRoot(workerAssemblyPath)
             .UseDefaultServiceProvider(options =>
@@ -99,6 +104,12 @@ public abstract class AcceptanceTestBase
                 Program.AddServices(context, collection);
                 ConfigureInProcessHostServices(context, collection);
             })
+            .UseSerilog(((context, serviceProvider, loggerConfiguration) =>
+            {
+                loggerConfiguration
+                    .Enrich.FromLogContext()
+                    .WriteTo.File(logPath);
+            }))
             .Build();
     }
 
@@ -118,6 +129,11 @@ public abstract class AcceptanceTestBase
         }
 
         _testScope?.Dispose();
+
+        foreach (var logfile in _logsFilesToAttach)
+        {
+            TestContext.AddTestAttachment(logfile);
+        }
     }
 
     [OneTimeTearDown]

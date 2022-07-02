@@ -2,17 +2,18 @@ using System.Diagnostics;
 using FluentAssertions;
 using JayyTee.MassTransitSample.Application.Features.PingPong;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JayyTee.MassTransitSample.Worker.Tests;
 
 public class PingPongTests : MassTransitTestBase
 {
-    protected override void AddTestServices(IServiceCollection services)
+    protected override void AddTestServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<MessageList<Pong>>();
 
-        base.AddTestServices(services);
+        base.AddTestServices(services, configuration);
     }
 
     protected override void ConfigureBus(IBusRegistrationConfigurator configurator)

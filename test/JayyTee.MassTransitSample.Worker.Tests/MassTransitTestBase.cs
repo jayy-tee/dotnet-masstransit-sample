@@ -1,4 +1,5 @@
 using MassTransit;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace JayyTee.MassTransitSample.Worker.Tests;
@@ -7,7 +8,7 @@ public abstract class MassTransitTestBase : AcceptanceTestBase
 {
     private IBusControl _busControl;
 
-    protected override void AddTestServices(IServiceCollection services)
+    protected override void AddTestServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddMassTransit(configurator =>
         {

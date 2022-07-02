@@ -2,6 +2,9 @@ using FluentAssertions;
 using JayyTee.MassTransitSample.Application.Features.PasswordReset;
 using JayyTee.MassTransitSample.Worker.Tests.Infrastructure.Mailhog;
 using MassTransit;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace JayyTee.MassTransitSample.Worker.Tests;
 
@@ -11,21 +14,25 @@ public class PasswordResetTests : MassTransitTestBase
 {
     private MailhogApiClient _client;
 
-    [OneTimeSetUp]
-    public void OneTimeSetupPasswordResetTest()
+    protected override void AddTestServices(IServiceCollection services, IConfiguration configuration)
     {
-        _client = new MailhogApiClient(new MailhogSettings());
-    }
+        services.Configure<MailhogSettings>(configuration.GetSection(MailhogSettings.SectionName));
+        services.AddTransient<MailhogApiClient>();
 
-    [OneTimeTearDown]
-    public void TearDown()
-    {
-        _client.Dispose();
+        services.AddHttpClient();
+        services.AddHttpClient<MailhogApiClient>(delegate(IServiceProvider provider, HttpClient client)
+        {
+            var settings = provider.GetRequiredService<IOptions<MailhogSettings>>().Value;
+            client.BaseAddress = new Uri(settings.ApiBaseUri);
+        });
+
+        base.AddTestServices(services, configuration);
     }
 
     [SetUp]
     public async Task SetupPasswordResetTests()
     {
+        _client = Resolve<MailhogApiClient>();
         await _client.DeleteAllMessagesAsync();
     }
 

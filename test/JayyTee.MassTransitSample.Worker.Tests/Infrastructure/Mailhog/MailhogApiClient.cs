@@ -11,16 +11,13 @@ public record MailhogMessage
     public string Body { get; set; } = null!;
 }
 
-public class MailhogApiClient : IDisposable
+public class MailhogApiClient
 {
-    private readonly MailhogSettings _settings;
     private readonly HttpClient _httpClient;
 
-    public MailhogApiClient(MailhogSettings settings)
+    public MailhogApiClient(HttpClient httpClient)
     {
-        _settings = settings;
-        _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri(_settings.ApiBaseUri);
+        _httpClient = httpClient;
     }
 
     public async Task DeleteAllMessagesAsync()
@@ -53,6 +50,4 @@ public class MailhogApiClient : IDisposable
             Subject = item.Content.Headers.Subject?.FirstOrDefault() ?? string.Empty,
             Body = item.Content.Body
         };
-
-    public void Dispose() => _httpClient.Dispose();
 }

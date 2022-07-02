@@ -17,14 +17,14 @@ public abstract class AcceptanceTestBase
     protected ServiceProvider ServiceProvider = null!;
     private IServiceScope _testScope = null!;
     private IHost? _host;
-    private TestSettings _testSettings = null!;
+    protected TestSettings Settings = null!;
     private string[] _testCategoriesToBeIgnored = null!;
 
     private List<string> _logsFilesToAttach = new();
 
     protected T Resolve<T>() where T : notnull => _testScope.ServiceProvider.GetRequiredService<T>();
 
-    protected virtual void AddTestServices(IServiceCollection services) { }
+    protected virtual void AddTestServices(IServiceCollection services, IConfiguration configuration) { }
 
     [OneTimeSetUp]
     public void InitAcceptanceTestBase()
@@ -49,9 +49,9 @@ public abstract class AcceptanceTestBase
         var services = new ServiceCollection();
         services.AddSingleton(testConfiguration);
 
-        _testSettings = testConfiguration.GetSection(TestSettings.SectionName).Get<TestSettings>();
+        Settings = testConfiguration.GetSection(TestSettings.SectionName).Get<TestSettings>();
 
-        AddTestServices(services);
+        AddTestServices(services, testConfiguration);
 
         ServiceProvider = services.BuildServiceProvider();
     }
@@ -65,7 +65,7 @@ public abstract class AcceptanceTestBase
 
         _testScope = ServiceProvider.CreateScope();
 
-        if (!_testSettings.RunInProcess) return;
+        if (!Settings.RunInProcess) return;
         TestContext.WriteLine("Initialising in-process host");
 
         InitialiseInProcessHost();

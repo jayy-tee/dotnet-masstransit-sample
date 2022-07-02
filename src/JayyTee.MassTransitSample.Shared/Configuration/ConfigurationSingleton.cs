@@ -13,7 +13,7 @@ public static class ConfigurationSingleton
 
     public static IConfiguration Initialise(string? environmentVariablePrefix)
     {
-        if (_instance is not null) throw new InvalidOperationException("Cannot initialise more than once");
+        if (_instance is not null) return _instance;
 
         lock (_padlock)
         {

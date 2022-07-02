@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using FluentAssertions;
 using JayyTee.MassTransitSample.Shared.Configuration;
 using Microsoft.Extensions.Configuration;
@@ -142,5 +143,81 @@ public abstract class AcceptanceTestBase
         TestContext.WriteLine("Base Onetime tear-down");
 
         ServiceProvider?.Dispose();
+    }
+
+    protected static void Eventually(Action callback, int timeoutInSeconds, int waitBetweenRetriesInMillis)
+    {
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        var timeout = timeoutInSeconds * 1000;
+        bool successIndicator = false;
+        int retries = 0;
+
+        Exception? lastException = null;
+
+        do
+        {
+            try
+            {
+                callback.Invoke();
+                successIndicator = true;
+                break;
+            }
+            catch (Exception e)
+            {
+                lastException = e;
+
+                retries++;
+                Console.WriteLine($"Retry Attempt {retries}: Waiting {waitBetweenRetriesInMillis}ms");
+                Thread.Sleep(waitBetweenRetriesInMillis);
+            }
+        } while (stopwatch.ElapsedMilliseconds <= timeout);
+
+        if (successIndicator is false)
+        {
+            Console.WriteLine($"Retry Timeout expired after {timeoutInSeconds}s. Failing test.");
+            Assert.Fail(lastException!.Message);
+        }
+
+        stopwatch.Stop();
+    }
+
+    protected static async Task EventuallyAsync(Func<Task> callback, int timeoutInSeconds, int waitBetweenRetriesInMillis)
+    {
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        var timeout = timeoutInSeconds * 1000;
+        bool successIndicator = false;
+        int retries = 0;
+
+        Exception? lastException = null;
+
+        do
+        {
+            try
+            {
+                await callback();
+                successIndicator = true;
+                break;
+            }
+            catch (Exception e)
+            {
+                lastException = e;
+
+                retries++;
+                Console.WriteLine($"Retry Attempt {retries}: Waiting {waitBetweenRetriesInMillis}ms");
+                Thread.Sleep(waitBetweenRetriesInMillis);
+            }
+        } while (stopwatch.ElapsedMilliseconds <= timeout);
+
+        if (successIndicator is false)
+        {
+            Console.WriteLine($"Retry Timeout expired after {timeoutInSeconds}s. Failing test.");
+            Assert.Fail(lastException!.Message);
+        }
+
+        stopwatch.Stop();
     }
 }

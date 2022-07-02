@@ -43,6 +43,7 @@ public partial class Program
     {
         services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(15));
         services.AddApplicationServices();
+        services.AddSharedServices(hostContext.Configuration);
         services.AddMessagingEndpoints(hostContext.Configuration,
             consumerAnchorTypesForRegistration: new[] { typeof(ConsumerAnchor), typeof(JayyTee.MassTransitSample.Application.ConsumerAnchor) });
     }

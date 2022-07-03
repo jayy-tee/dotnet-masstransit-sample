@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
-const string ServiceEnvironmentVariablePrefix = "JAYYTEE_API";
-
-var configuration = ConfigurationSingleton.Initialise(ServiceEnvironmentVariablePrefix);
+var configuration = ConfigurationSingleton.Instance;
 Log.Logger = LoggingExtensions.BuildLogger(configuration);
 
 try

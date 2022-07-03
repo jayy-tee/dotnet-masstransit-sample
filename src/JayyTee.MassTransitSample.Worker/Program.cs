@@ -2,9 +2,7 @@ using JayyTee.MassTransitSample.Shared.Configuration;
 using JayyTee.MassTransitSample.Shared.Logging;
 using Serilog;
 
-const string ServiceEnvironmentVariablePrefix = "JAYYTEE_WORKER";
-
-var configuration = ConfigurationSingleton.Initialise(ServiceEnvironmentVariablePrefix);
+var configuration = ConfigurationSingleton.Instance;
 Log.Logger = LoggingExtensions.BuildLogger(configuration);
 
 try
@@ -43,6 +41,7 @@ public partial class Program
     {
         services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(15));
         services.AddApplicationServices();
+        services.AddSharedServices(hostContext.Configuration);
         services.AddMessagingEndpoints(hostContext.Configuration,
             consumerAnchorTypesForRegistration: new[] { typeof(ConsumerAnchor), typeof(JayyTee.MassTransitSample.Application.ConsumerAnchor) });
     }

@@ -1,9 +1,6 @@
 using FluentAssertions;
 using JayyTee.MassTransitSample.Application.Features.PingPong;
 using JayyTee.MassTransitSample.Worker.Tests.Infrastructure;
-using MassTransit;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace JayyTee.MassTransitSample.Worker.Tests;
 

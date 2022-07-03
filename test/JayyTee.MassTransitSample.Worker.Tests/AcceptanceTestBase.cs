@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using FluentAssertions;
 using JayyTee.MassTransitSample.Shared.Configuration;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework.Internal;
 using Serilog;
@@ -11,6 +9,8 @@ namespace JayyTee.MassTransitSample.Worker.Tests;
 
 public abstract class AcceptanceTestBase
 {
+    protected virtual bool RequiresInProcess => false;
+
     private const string EnvironmentVariablePrefix = "JAYYTEE_TEST_";
     private const string DefaultTestExecutionContext = "Local-InProcess";
 
@@ -62,6 +62,7 @@ public abstract class AcceptanceTestBase
         TestContext.WriteLine("Base Setup");
 
         SkipForIgnoredTestCategories();
+        SkipIfRequiresInProcessButNotSelfHosting();
 
         _testScope = ServiceProvider.CreateScope();
 
@@ -79,6 +80,12 @@ public abstract class AcceptanceTestBase
 
         if (testCategories.Intersect(_testCategoriesToBeIgnored).Any())
             Assert.Ignore($"Category ignored by runsettings: {string.Join(",", testCategories)}");
+    }
+
+    private void SkipIfRequiresInProcessButNotSelfHosting()
+    {
+        if (RequiresInProcess && Settings.RunInProcess == false)
+            Assert.Ignore($"The test {TestContext.CurrentContext.Test.Name} has been skipped as it requires the service to be self-hosted.");
     }
 
     private void InitialiseInProcessHost()
